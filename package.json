@@ -1,0 +1,39 @@
+{
+  "name": "sog",
+  "version": "1.0.0",
+  "description": "Simple Online Game using threejs, nodejs, websocket.",
+  "scripts": {
+    "dev": "webpack-dev-server --config=client/webpack.config.js --env=development",
+    "build": "webpack --config=client/webpack.config.js --env=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evilkuma/SOG.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evilkuma/SOG/issues"
+  },
+  "homepage": "https://github.com/evilkuma/SOG#readme",
+  "dependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
+    "body-parser": "^1.19.0",
+    "css-loader": "^3.1.0",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "express-ws": "^4.0.0",
+    "file-loader": "^4.1.0",
+    "html-webpack-plugin": "^3.2.0",
+    "three": "^0.106.2",
+    "webpack": "^4.36.1",
+    "webpack-dev-server": "^3.7.2"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.3.6"
+  }
+}
