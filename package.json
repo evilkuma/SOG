@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Simple Online Game using threejs, nodejs, websocket.",
   "scripts": {
-    "dev": "webpack-dev-server --config=client/webpack.config.js --env=development",
-    "build": "webpack --config=client/webpack.config.js --env=production"
+    "dev": "node server/main.js onlyws | webpack-dev-server --config=client/webpack.config.js --env=development",
+    "build": "node server/main.js | webpack --config=client/webpack.config.js --env=production",
+    "server": "node server/main.js"
   },
   "repository": {
     "type": "git",

@@ -8,6 +8,8 @@ const app = express()
 require('express-ws')(app)
 // const ws_server = expressWs.getWss('/');
 
+const onlyws = process.argv.includes('onlyws')
+
 app.use(session({
     resave: false,
     saveUninitialized: false,
@@ -16,7 +18,9 @@ app.use(session({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false })); 
 
-app.use('/', express.static(path.join(__dirname, '../client/dist')))
+if(!onlyws) {
+    app.use('/', express.static(path.join(__dirname, '../client/dist')))
+}
 
 app.ws('/', function(ws, req) {
     
