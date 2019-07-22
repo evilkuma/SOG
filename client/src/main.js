@@ -20,15 +20,6 @@ class Player extends THREE.Group {
 
 let scene, renderer, controls, cube, player
 
-let moveForward = false;
-let moveBackward = false;
-let moveLeft = false;
-let moveRight = false;
-let canJump = true;
-let velocity = 0;
-let jumpPower = 0;
-let direction = new THREE.Vector3();
-
 function init() {
 
     scene = new THREE.Scene()
@@ -67,96 +58,10 @@ function init() {
         controls.lock()
 
     }, false)
-    
-    const onKeyDown = function ( event ) {
-        switch ( event.keyCode ) {
-            case 38: // up
-            case 87: // w
-                moveForward = true;
-                break;
-            case 37: // left
-            case 65: // a
-                moveLeft = true;
-                break;
-            case 40: // down
-            case 83: // s
-                moveBackward = true;
-                break;
-            case 39: // right
-            case 68: // d
-                moveRight = true;
-                break;
-            case 32: // space
-                if ( canJump === true ) jumpPower = 1;
-                canJump = false;
-                break;
-        }
-    };
-
-    const onKeyUp = function ( event ) {
-        switch ( event.keyCode ) {
-            case 38: // up
-            case 87: // w
-                moveForward = false;
-                break;
-            case 37: // left
-            case 65: // a
-                moveLeft = false;
-                break;
-            case 40: // down
-            case 83: // s
-                moveBackward = false;
-                break;
-            case 39: // right
-            case 68: // d
-                moveRight = false;
-                break;
-        }
-    };
-
-    document.addEventListener( 'keydown', onKeyDown, false );
-    document.addEventListener( 'keyup', onKeyUp, false );
 
     setInterval(e => {
         
-        if ( controls.isLocked === true ) {
-
-            // TODO: move code to movement controller
-
-            direction.z = Number( moveForward ) - Number( moveBackward );
-            direction.x = Number( moveLeft ) - Number( moveRight );
-            direction.normalize(); 
-
-            if(direction.x || direction.z) {
-                if(velocity < 0.3) {
-                    velocity += 0.01
-                    velocity = +velocity.toFixed(3)
-                }
-            } else {
-                velocity = 0
-            }
-
-            if(velocity) {
-                controls.getObject().position.x += -direction.x*(velocity * controls.getObject().matrix.elements[0]) + direction.z*(velocity * controls.getObject().matrix.elements[2])
-                controls.getObject().position.z -= direction.x*(velocity * controls.getObject().matrix.elements[2]) + direction.z*(velocity * controls.getObject().matrix.elements[0])
-            }
-
-            if(controls.getObject().position.y > 2) {
-                controls.getObject().position.y -= 0.2;
-            }
-
-            if(jumpPower > 0) {
-                controls.getObject().position.y += 0.6
-                jumpPower -= 0.1
-            }
-
-            // TODO: search raycast with palyer
-            if(controls.getObject().position.y < 2) {
-                controls.getObject().position.y = 2;
-                canJump = true
-            }
-
-        }
+        controls.update()
 
         renderer.render( scene, player.camera );
 
