@@ -10,7 +10,9 @@ import { Euler } from 'three/src/math/Euler'
 import { Vector3 } from 'three/src/math/Vector3'
 import { EventDispatcher } from 'three/src/core/EventDispatcher'
 
-var PointerLockControls = function ( camera, domElement ) {
+var PointerLockControls = function ( camera, scene, domElement ) {
+
+	// TODO: add X rotation on camera only
 
 	// speed settings
 	// max movement speed
@@ -250,24 +252,24 @@ var PointerLockControls = function ( camera, domElement ) {
 		}
 
 		if(velocity) {
-			this.getObject().position.x += -direction.x*(velocity * this.getObject().matrix.elements[0]) + 
-											direction.z*(velocity * this.getObject().matrix.elements[2])
-			this.getObject().position.z -= direction.x*(velocity * this.getObject().matrix.elements[2]) + 
-											direction.z*(velocity * this.getObject().matrix.elements[0])
+			camera.position.x += -direction.x*(velocity * camera.matrix.elements[0]) + 
+											direction.z*(velocity * camera.matrix.elements[2])
+			camera.position.z -= direction.x*(velocity * camera.matrix.elements[2]) + 
+											direction.z*(velocity * camera.matrix.elements[0])
 		}
 
-		if(this.getObject().position.y > 2) {
-			this.getObject().position.y -= 0.2;
+		if(camera.position.y > 2) {
+			camera.position.y -= 0.2;
 		}
 
 		if(jumpPower > 0) {
-			this.getObject().position.y += this.jumpStep
+			camera.position.y += this.jumpStep
 			jumpPower -= this.jumpAttenuation
 		}
 
 		// TODO: search raycast with palyer
-		if(this.getObject().position.y < 2) {
-			this.getObject().position.y = 2;
+		if(camera.position.y < 2) {
+			camera.position.y = 2;
 			canJump = true
 		}
 
