@@ -59,6 +59,14 @@ var PointerLockControls = function ( camera, domElement ) {
 	let jumpPower = 0;
 	let direction = new Vector3();
 
+	const buttons = {
+		MOVEFORW: [38, 87],	// up|w
+		MOVEBACK: [40, 83], // down|s
+		MOVEL: [37, 65], // left|a
+		MOVER: [39, 68], // right|d
+		JUMP: [32] // space
+	}
+
 	function onMouseMove( event ) {
 
 		if ( scope.isLocked === false ) return;
@@ -105,15 +113,15 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	function onKeyDown(event) {
 		
-		if([38, 87].includes(+event.keyCode)) {	// up|w
+		if(buttons.MOVEFORW.includes(+event.keyCode)) {
 			moveForward = true
-		} else if([37, 65].includes(+event.keyCode)) { // left|a
+		} else if(buttons.MOVEL.includes(+event.keyCode)) {
 			moveLeft = true
-		} else if([40, 83].includes(+event.keyCode)) { // down|s
+		} else if(buttons.MOVEBACK.includes(+event.keyCode)) {
 			moveBackward = true
-		} else if([39, 68].includes(+event.keyCode)) { // right|d
+		} else if(buttons.MOVER.includes(+event.keyCode)) {
 			moveRight = true
-		} else if([32].includes(+event.keyCode)) { // space
+		} else if(buttons.JUMP.includes(+event.keyCode)) {
 			if(canJump === true) jumpPower = this.jumpPower;
 			canJump = false;
 		}
@@ -122,13 +130,13 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	function onKeyUp(event) {
 		
-		if([38, 87].includes(+event.keyCode)) {	// up|w
+		if(buttons.MOVEFORW.includes(+event.keyCode)) {
 			moveForward = false
-		} else if([37, 65].includes(+event.keyCode)) { // left|a
+		} else if(buttons.MOVEL.includes(+event.keyCode)) {
 			moveLeft = false
-		} else if([40, 83].includes(+event.keyCode)) { // down|s
+		} else if(buttons.MOVEBACK.includes(+event.keyCode)) {
 			moveBackward = false
-		} else if([39, 68].includes(+event.keyCode)) { // right|d
+		} else if(buttons.MOVER.includes(+event.keyCode)) {
 			moveRight = false
 		}
 
@@ -187,6 +195,36 @@ var PointerLockControls = function ( camera, domElement ) {
 	this.unlock = function () {
 
 		document.exitPointerLock();
+
+	};
+
+	this.addMoveLBtn = function() {
+
+		buttons.MOVEL.push(...arguments)
+
+	};
+
+	this.addMoveRBtn = function() {
+
+		buttons.MOVER.push(...arguments)
+
+	};
+
+	this.addMoveForwBtn = function() {
+
+		buttons.MOVEFORW.push(...arguments)
+
+	};
+
+	this.addMoveBackBtn = function() {
+
+		buttons.MOVEBACK.push(...arguments)
+
+	};
+
+	this.addJumpBtn = function() {
+
+		buttons.JUMP.push(...arguments)
 
 	};
 
