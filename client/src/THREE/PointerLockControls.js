@@ -2,17 +2,18 @@
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
  * 
- * modify:
+ * modify to player movement controller:
  * @author evilkuma / https://github.com/evilkuma
  */
 
 import { Euler } from 'three/src/math/Euler'
 import { Vector3 } from 'three/src/math/Vector3'
 import { EventDispatcher } from 'three/src/core/EventDispatcher'
+import { Box3 } from 'three/src/math/Box3'
 
-var PointerLockControls = function ( camera, scene, domElement ) {
+var PointerLockControls = function ( object, scene, domElement ) {
 
-	// TODO: add X rotation on camera only
+	this.cameraVerticalTurn = true
 
 	// speed settings
 	// max movement speed
@@ -60,6 +61,8 @@ var PointerLockControls = function ( camera, scene, domElement ) {
 	let velocity = 0;
 	let jumpPower = 0;
 	let direction = new Vector3();
+	
+    const box = new Box3
 
 	const buttons = {
 		MOVEFORW: [38, 87],	// up|w
@@ -76,14 +79,25 @@ var PointerLockControls = function ( camera, scene, domElement ) {
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		euler.setFromQuaternion( camera.quaternion );
+		if(this.cameraVerticalTurn) {
+			euler.copy( object.camera_group.rotation )
+			euler.y = object.rotation.y
+		} else {
+			euler.copy( object.rotation )
+		}
 
 		euler.y -= movementX * 0.002;
 		euler.x -= movementY * 0.002;
 
 		euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
 
-		camera.quaternion.setFromEuler( euler );
+		if (this.cameraVerticalTurn) {
+			object.camera_group.rotation.x = euler.x
+			object.rotation.y = euler.y
+			object.camera_group.rotation.z = euler.z
+		} else {
+			object.rotation.copy(euler)
+		}
 
 		scope.dispatchEvent( changeEvent );
 
@@ -146,7 +160,7 @@ var PointerLockControls = function ( camera, scene, domElement ) {
 
 	this.connect = function () {
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'mousemove', onMouseMove.bind(this), false );
 		document.addEventListener( 'pointerlockchange', onPointerlockChange, false );
 		document.addEventListener( 'pointerlockerror', onPointerlockError, false );
 		document.addEventListener( 'keydown', onKeyDown.bind(this), false )
@@ -172,7 +186,7 @@ var PointerLockControls = function ( camera, scene, domElement ) {
 
 	this.getObject = function () { // retaining this method for backward compatibility
 
-		return camera;
+		return object;
 
 	};
 
@@ -182,7 +196,7 @@ var PointerLockControls = function ( camera, scene, domElement ) {
 
 		return function ( v ) {
 
-			return v.copy( direction ).applyQuaternion( camera.quaternion );
+			return v.copy( direction ).applyQuaternion( object.quaternion );
 
 		};
 
@@ -252,26 +266,38 @@ var PointerLockControls = function ( camera, scene, domElement ) {
 		}
 
 		if(velocity) {
-			camera.position.x += -direction.x*(velocity * camera.matrix.elements[0]) + 
-											direction.z*(velocity * camera.matrix.elements[2])
-			camera.position.z -= direction.x*(velocity * camera.matrix.elements[2]) + 
-											direction.z*(velocity * camera.matrix.elements[0])
+			object.position.x += -direction.x*(velocity * object.matrix.elements[0]) + 
+											direction.z*(velocity * object.matrix.elements[2])
+			object.position.z -= direction.x*(velocity * object.matrix.elements[2]) + 
+											direction.z*(velocity * object.matrix.elements[0])
 		}
 
-		if(camera.position.y > 2) {
-			camera.position.y -= 0.2;
+		if(object.position.y > 2) {
+			object.position.y -= 0.2;
 		}
 
 		if(jumpPower > 0) {
-			camera.position.y += this.jumpStep
+			object.position.y += this.jumpStep
 			jumpPower -= this.jumpAttenuation
 		}
 
 		// TODO: search raycast with palyer
-		if(camera.position.y < 2) {
-			camera.position.y = 2;
+		if(object.position.y < 2) {
+			object.position.y = 2;
 			canJump = true
 		}
+
+		const pc = object.boundingBox
+		scene.traverse(obj => {
+			if(obj.isMesh && obj.userData.missPlayer) {
+				box.setFromObject(obj)
+				const intersect = pc.intersect( box )
+
+				if(!intersect.isEmpty()) {
+					console.log('player intersect with:', obj)
+				}
+			}
+		})
 
 	}
 

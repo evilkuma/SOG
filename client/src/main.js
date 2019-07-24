@@ -8,7 +8,9 @@ class Player extends THREE.Group {
     constructor() {
         super()
 
-        this.add(new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000))
+        const camera_group = new THREE.Group
+        camera_group.add(new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000))
+        this.add(camera_group)
         this.add(new THREE.PointLight(0xffffff, 1.5))
         
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial())
@@ -17,15 +19,17 @@ class Player extends THREE.Group {
         this.add(mesh)
 
         this.camera.position.z = 5
-        this.camera.position.y = 5
-        this.camera.rotation.x = -Math.PI/4
 
         this._collision = new THREE.Box3
         
     }
 
-    get camera() {
+    get camera_group() {
         return this.children[0]
+    }
+
+    get camera() {
+        return this.camera_group.children[0]
     }
 
     get boundingBox() {
@@ -36,7 +40,6 @@ class Player extends THREE.Group {
 
         const tmp = size.sub(MIN_PLAYER_SIZE)
         if(tmp.x < 0 || tmp.y < 0 || tmp.z < 0) {
-            debugger
             const tmp1 = MIN_PLAYER_SIZE.clone().divideScalar(2)
             this._collision.min.sub(tmp1)
             this._collision.max.add(tmp1)
@@ -87,16 +90,9 @@ function init() {
 
     }, false)
 
-
-    const box = new THREE.Box3
     setInterval(e => {
         
         controls.update()
-
-        // test inersect by bb
-        const pc = player.boundingBox
-        box.setFromObject(cube)
-        console.log( pc.intersect( box ).min )//
 
         renderer.render( scene, player.camera );
 
@@ -108,10 +104,12 @@ init()
 
 cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({color: 'red'}))
 cube.position.set(0, 0.5, -2)
+cube.userData.missPlayer = true
 scene.add(cube)
 
 var plane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshLambertMaterial({color: 'green'}))
 plane.rotation.x = -Math.PI/2
+plane.userData.missPlayer = true
 scene.add(plane)
 
 // websocket
