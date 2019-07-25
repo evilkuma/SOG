@@ -17,6 +17,12 @@ export { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial'
 // math
 export { Color } from 'three/src/math/Color'
 export { Vector3 } from 'three/src/math/Vector3'
-export { Box3 } from 'three/src/math/Box3'
+import { Box3 } from 'three/src/math/Box3'; export { Box3 } // for modify
 // examples
 export { PointerLockControls } from './PointerLockControls'
+
+
+// modify Box3
+Box3.prototype.distanceToBox = function(box) {
+  console.log('hi')
+}

@@ -15,6 +15,7 @@ class Player extends THREE.Group {
         
         const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial())
         mesh.position.y -= 1
+        // mesh.rotation.y = Math.PI/4
         // mesh.visible = false
         this.add(mesh)
 
@@ -50,7 +51,7 @@ class Player extends THREE.Group {
 
 }
 
-let scene, renderer, controls, cube, player
+let scene, renderer, controls, cube, player, missed_objects = []
 
 function init() {
 
@@ -58,7 +59,7 @@ function init() {
     scene.background = new THREE.Color(0x232b2b)
 
     player = new Player
-    player.position.set(0, 2, 0)
+    player.position.set(0, 2, 2)
     scene.add(player)
 
     renderer = new THREE.WebGLRenderer({antialias: true, alpha: true})
@@ -66,7 +67,7 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight )
     renderer.gammaOutput = true
 
-    controls = new THREE.PointerLockControls( player, scene, renderer.domElement )
+    controls = new THREE.PointerLockControls( player, missed_objects, renderer.domElement )
 
     document.body.appendChild( renderer.domElement )
 
@@ -102,22 +103,21 @@ function init() {
 
 init()
 
-cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({color: 'red'}))
-cube.position.set(0, 0.5, -2)
-cube.userData.missPlayer = true
+cube = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 2), new THREE.MeshLambertMaterial({color: 'red'}))
+cube.position.set(0, 0, 0)
+missed_objects.push(cube)
 scene.add(cube)
 
 var plane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshLambertMaterial({color: 'green'}))
 plane.rotation.x = -Math.PI/2
-plane.userData.missPlayer = true
 scene.add(plane)
 
 // websocket
-const ws = new WebSocket("ws://localhost:80")
+// const ws = new WebSocket("ws://localhost:80")
 
-ws.onopen = req => {
-    console.log('open')
-    ws.send('hi')
-}
-ws.onclose = req => console.log('close')
-ws.onmessage = req => console.log(req.data)
+// ws.onopen = req => {
+//     console.log('open')
+//     ws.send('hi')
+// }
+// ws.onclose = req => console.log('close')
+// ws.onmessage = req => console.log(req.data)

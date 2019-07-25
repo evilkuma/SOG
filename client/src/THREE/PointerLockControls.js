@@ -10,8 +10,9 @@ import { Euler } from 'three/src/math/Euler'
 import { Vector3 } from 'three/src/math/Vector3'
 import { EventDispatcher } from 'three/src/core/EventDispatcher'
 import { Box3 } from 'three/src/math/Box3'
+import { Raycaster } from 'three/src/core/Raycaster'
 
-var PointerLockControls = function ( object, scene, domElement ) {
+var PointerLockControls = function ( object, objects, domElement ) {
 
 	this.cameraVerticalTurn = true
 
@@ -61,6 +62,7 @@ var PointerLockControls = function ( object, scene, domElement ) {
 	let velocity = 0;
 	let jumpPower = 0;
 	let direction = new Vector3();
+	const raycaster = new Raycaster
 	
     const box = new Box3
 
@@ -71,6 +73,12 @@ var PointerLockControls = function ( object, scene, domElement ) {
 		MOVER: [39, 68], // right|d
 		JUMP: [32] // space
 	}
+
+  function ceil(a, b = 0) {
+
+    return Math.ceil(a*Math.pow(10,b))/Math.pow(10,b)
+
+  }
 
 	function onMouseMove( event ) {
 
@@ -248,8 +256,8 @@ var PointerLockControls = function ( object, scene, domElement ) {
 
 		if(!this.isLocked) return
 		
-		direction.z = Number( moveForward ) - Number( moveBackward );
-		direction.x = Number( moveLeft ) - Number( moveRight );
+		direction.z = Number( moveBackward ) - Number( moveForward );
+		direction.x = Number( moveRight ) - Number( moveLeft );
 		direction.normalize(); 
 
 		if(direction.x || direction.z) {
@@ -266,10 +274,41 @@ var PointerLockControls = function ( object, scene, domElement ) {
 		}
 
 		if(velocity) {
-			object.position.x += -direction.x*(velocity * object.matrix.elements[0]) + 
-											direction.z*(velocity * object.matrix.elements[2])
-			object.position.z -= direction.x*(velocity * object.matrix.elements[2]) + 
-											direction.z*(velocity * object.matrix.elements[0])
+
+			const real_dir = new Vector3(
+				direction.x * object.matrix.elements[0] - direction.z * object.matrix.elements[2],
+				0,
+				direction.x * object.matrix.elements[2] + direction.z * object.matrix.elements[0]
+			)
+
+      const mv = new Vector3(
+        direction.x*(velocity * object.matrix.elements[0]) - direction.z*(velocity * object.matrix.elements[2]),
+        0,
+        (direction.x*(velocity * object.matrix.elements[2]) + direction.z*(velocity * object.matrix.elements[0]))
+			)
+			
+			const obj_size = new Vector3
+			object.boundingBox.getSize(obj_size)
+			const obj_len = obj_size.clone().divideScalar(2).multiply(real_dir)
+
+			raycaster.ray.origin.copy(object.position)
+			raycaster.ray.origin.y = 0
+			raycaster.ray.direction.copy(real_dir)
+			const intersects = raycaster.intersectObjects(objects)
+
+			if(intersects[0]) {
+				console.log(obj_len.length(), intersects[0].distance, mv.length())
+
+			}
+
+			if(intersects[0] && intersects[0].distance - obj_len.length() < mv.length()) {
+				object.position.copy(
+					intersects[0].point.sub(obj_len)
+				)
+			} else {
+				object.position.add(mv)
+			}
+
 		}
 
 		if(object.position.y > 2) {
@@ -286,18 +325,6 @@ var PointerLockControls = function ( object, scene, domElement ) {
 			object.position.y = 2;
 			canJump = true
 		}
-
-		const pc = object.boundingBox
-		scene.traverse(obj => {
-			if(obj.isMesh && obj.userData.missPlayer) {
-				box.setFromObject(obj)
-				const intersect = pc.intersect( box )
-
-				if(!intersect.isEmpty()) {
-					console.log('player intersect with:', obj)
-				}
-			}
-		})
 
 	}
 
