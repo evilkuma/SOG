@@ -21,6 +21,8 @@ import { Box3 } from 'three/src/math/Box3'; export { Box3 } // for modify
 // examples
 export { PointerLockControls } from './PointerLockControls'
 
+export * from 'three/src/constants'
+
 
 // modify Box3
 Box3.prototype.distanceToBox = function(box) {

@@ -281,33 +281,55 @@ var PointerLockControls = function ( object, objects, domElement ) {
 				direction.x * object.matrix.elements[2] + direction.z * object.matrix.elements[0]
 			)
 
-      const mv = new Vector3(
-        direction.x*(velocity * object.matrix.elements[0]) - direction.z*(velocity * object.matrix.elements[2]),
-        0,
-        (direction.x*(velocity * object.matrix.elements[2]) + direction.z*(velocity * object.matrix.elements[0]))
-			)
-			
+      const mv = real_dir.clone().multiplyScalar(velocity)
+			console.log(real_dir)
 			const obj_size = new Vector3
+			const obj_rot = object.rotation.clone()
+			object.rotation.set(0, 0, 0)
 			object.boundingBox.getSize(obj_size)
+			object.rotation.copy(obj_rot)
+
 			const obj_len = obj_size.clone().divideScalar(2).multiply(real_dir)
 
-			raycaster.ray.origin.copy(object.position)
+			raycaster.ray.origin.copy(object.position.clone().sub(real_dir.clone().multiplyScalar(-.1)))
 			raycaster.ray.origin.y = 0
 			raycaster.ray.direction.copy(real_dir)
-			const intersects = raycaster.intersectObjects(objects)
+			raycaster.far = obj_len.length()
 
-			if(intersects[0]) {
-				console.log(obj_len.length(), intersects[0].distance, mv.length())
+			//TODO test this https://jsfiddle.net/prisoner849/8uxw667m/
 
-			}
+      
 
-			if(intersects[0] && intersects[0].distance - obj_len.length() < mv.length()) {
-				object.position.copy(
-					intersects[0].point.sub(obj_len)
-				)
-			} else {
+
+      // const obj_size = new Vector3
+			// const obj_rot = object.rotation.clone()
+			// object.rotation.set(0, 0, 0)
+			// object.boundingBox.getSize(obj_size)
+			// object.rotation.copy(obj_rot)
+
+			// const obj_len = obj_size.clone().divideScalar(2).multiply(real_dir)
+
+			// raycaster.ray.origin.copy(object.position.clone().sub(real_dir.clone().multiplyScalar(-.1)))
+			// // raycaster.ray.origin.y = 0
+			// raycaster.ray.direction.copy(real_dir)
+			// raycaster.far = obj_len.length()
+
+			// console.log(object.children[2].raycast(new Raycaster, objects))
+
+			// // TODO
+			// const inter = {left: null, right: null}
+
+			// const intersects = raycaster.intersectObjects(objects)
+
+			// if(intersects[0]) {
+			// 	object.position.copy(
+			// 		intersects[0].point.sub(obj_len)
+			// 	)
+			// 	// console.log(intersects[0].point.sub(obj_len))
+			// } else {
 				object.position.add(mv)
-			}
+			// 	// console.log('mv')
+			// }
 
 		}
 

@@ -2,7 +2,6 @@
 console.log(`hi in ${MODE} mode`)
 console.log('i have THREE.js', THREE)
 
-const MIN_PLAYER_SIZE = new THREE.Vector3(1, 1, 1)
 class Player extends THREE.Group {
 
     constructor() {
@@ -22,6 +21,7 @@ class Player extends THREE.Group {
         this.camera.position.z = 5
 
         this._collision = new THREE.Box3
+        this.test_collision = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshBasicMaterial({side: THREE.DoubleSide}))
         
     }
 
@@ -39,14 +39,11 @@ class Player extends THREE.Group {
         const size = new THREE.Vector3()
         this._collision.getSize(size)
 
-        const tmp = size.sub(MIN_PLAYER_SIZE)
-        if(tmp.x < 0 || tmp.y < 0 || tmp.z < 0) {
-            const tmp1 = MIN_PLAYER_SIZE.clone().divideScalar(2)
-            this._collision.min.sub(tmp1)
-            this._collision.max.add(tmp1)
-        }
-
         return this._collision
+    }
+
+    get collision () {
+        return this.test_collision
     }
 
 }
