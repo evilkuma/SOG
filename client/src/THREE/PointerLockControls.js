@@ -11,6 +11,7 @@ import { Vector3 } from 'three/src/math/Vector3'
 import { EventDispatcher } from 'three/src/core/EventDispatcher'
 import { Box3 } from 'three/src/math/Box3'
 import { Raycaster } from 'three/src/core/Raycaster'
+import { Quaternion } from 'three/src/math/Quaternion'
 
 var PointerLockControls = function ( object, objects, domElement ) {
 
@@ -282,7 +283,11 @@ var PointerLockControls = function ( object, objects, domElement ) {
 			)
 
       const mv = real_dir.clone().multiplyScalar(velocity)
-			console.log(real_dir)
+
+      var quaternion = new Quaternion();
+      quaternion.setFromAxisAngle( new Vector3( 0, 1, 0 ), Math.PI / 2 );
+      const real_ldir = real_dir.clone().applyQuaternion( quaternion ); 
+
 			const obj_size = new Vector3
 			const obj_rot = object.rotation.clone()
 			object.rotation.set(0, 0, 0)
@@ -290,6 +295,8 @@ var PointerLockControls = function ( object, objects, domElement ) {
 			object.rotation.copy(obj_rot)
 
 			const obj_len = obj_size.clone().divideScalar(2).multiply(real_dir)
+      const obj_len_rot = obj_size.clone().divideScalar(2).divide(real_dir)
+      //real_ldir.clone().multiply(obj_size.clone().divideScalar(2))
 
 			raycaster.ray.origin.copy(object.position.clone().sub(real_dir.clone().multiplyScalar(-.1)))
 			raycaster.ray.origin.y = 0
