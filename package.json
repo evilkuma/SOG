@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Simple Online Game using threejs, nodejs, websocket.",
   "scripts": {
-    "dev": "node server/main.js onlyws | webpack-dev-server --config=client/webpack.config.js --env=development",
+    "test": "node server/main.js onlyws | ",
+    "dev": "webpack-dev-server --config=client/webpack.config.js --env=development",
     "build": "node server/main.js | webpack --config=client/webpack.config.js --env=production",
     "server": "node server/main.js"
   },
@@ -30,7 +31,7 @@
     "express-ws": "^4.0.0",
     "file-loader": "^4.1.0",
     "html-webpack-plugin": "^3.2.0",
-    "three": "^0.106.2",
+    "three": "^0.115.0",
     "webpack": "^4.36.1",
     "webpack-dev-server": "^3.7.2"
   },

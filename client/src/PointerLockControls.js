@@ -6,14 +6,11 @@
  * @author evilkuma / https://github.com/evilkuma
  */
 
-import { Euler } from 'three/src/math/Euler'
-import { Vector3 } from 'three/src/math/Vector3'
-import { EventDispatcher } from 'three/src/core/EventDispatcher'
-import { Box3 } from 'three/src/math/Box3'
-import { Raycaster } from 'three/src/core/Raycaster'
-import { Quaternion } from 'three/src/math/Quaternion'
+import { Euler } from 'three'
+import { Vector3 } from 'three'
+import { EventDispatcher } from 'three'
 
-var PointerLockControls = function ( object, objects, domElement ) {
+var PointerLockControls = function ( object, domElement ) {
 
 	this.cameraVerticalTurn = true
 
@@ -32,11 +29,6 @@ var PointerLockControls = function ( object, objects, domElement ) {
 	this.jumpStep = 0.6
 	// jump price per conditional unit time
 	this.jumpAttenuation = 0.1
-
-	// failing settings
-	// TODO: use that when add raycast
-	this.maxAtitude = -3
-	this.spawnPosition = new Vector3
 
 	this.domElement = domElement || document.body;
 	this.isLocked = false;
@@ -63,9 +55,16 @@ var PointerLockControls = function ( object, objects, domElement ) {
 	let velocity = 0;
 	let jumpPower = 0;
 	let direction = new Vector3();
-	const raycaster = new Raycaster
-	
-    const box = new Box3
+
+	if(domElement) {
+
+		domElement.addEventListener('click', e => {
+    
+			this.lock()
+		
+		}, false)
+
+	}
 
 	const buttons = {
 		MOVEFORW: [38, 87],	// up|w
@@ -74,12 +73,6 @@ var PointerLockControls = function ( object, objects, domElement ) {
 		MOVER: [39, 68], // right|d
 		JUMP: [32] // space
 	}
-
-  function ceil(a, b = 0) {
-
-    return Math.ceil(a*Math.pow(10,b))/Math.pow(10,b)
-
-  }
 
 	function onMouseMove( event ) {
 
@@ -262,16 +255,24 @@ var PointerLockControls = function ( object, objects, domElement ) {
 		direction.normalize(); 
 
 		if(direction.x || direction.z) {
+
 			if(velocity < this.maxSpeed) {
+
 				velocity += this.acceleration
 				velocity = +velocity.toFixed(3)
 
 				if(velocity < this.minSpeed) {
+
 					velocity = this.minSpeed	
+
 				}
+
 			}
+
 		} else {
+
 			velocity = 0
+
 		}
 
 		if(velocity) {
@@ -282,77 +283,29 @@ var PointerLockControls = function ( object, objects, domElement ) {
 				direction.x * object.matrix.elements[2] + direction.z * object.matrix.elements[0]
 			)
 
-      const mv = real_dir.clone().multiplyScalar(velocity)
+     		const mv = real_dir.clone().multiplyScalar(velocity)
 
-      var quaternion = new Quaternion();
-      quaternion.setFromAxisAngle( new Vector3( 0, 1, 0 ), Math.PI / 2 );
-      const real_ldir = real_dir.clone().applyQuaternion( quaternion ); 
-
-			const obj_size = new Vector3
-			const obj_rot = object.rotation.clone()
-			object.rotation.set(0, 0, 0)
-			object.boundingBox.getSize(obj_size)
-			object.rotation.copy(obj_rot)
-
-			const obj_len = obj_size.clone().divideScalar(2).multiply(real_dir)
-      const obj_len_rot = obj_size.clone().divideScalar(2).divide(real_dir)
-      //real_ldir.clone().multiply(obj_size.clone().divideScalar(2))
-
-			raycaster.ray.origin.copy(object.position.clone().sub(real_dir.clone().multiplyScalar(-.1)))
-			raycaster.ray.origin.y = 0
-			raycaster.ray.direction.copy(real_dir)
-			raycaster.far = obj_len.length()
-
-			//TODO test this https://jsfiddle.net/prisoner849/8uxw667m/
-
-      
-
-
-      // const obj_size = new Vector3
-			// const obj_rot = object.rotation.clone()
-			// object.rotation.set(0, 0, 0)
-			// object.boundingBox.getSize(obj_size)
-			// object.rotation.copy(obj_rot)
-
-			// const obj_len = obj_size.clone().divideScalar(2).multiply(real_dir)
-
-			// raycaster.ray.origin.copy(object.position.clone().sub(real_dir.clone().multiplyScalar(-.1)))
-			// // raycaster.ray.origin.y = 0
-			// raycaster.ray.direction.copy(real_dir)
-			// raycaster.far = obj_len.length()
-
-			// console.log(object.children[2].raycast(new Raycaster, objects))
-
-			// // TODO
-			// const inter = {left: null, right: null}
-
-			// const intersects = raycaster.intersectObjects(objects)
-
-			// if(intersects[0]) {
-			// 	object.position.copy(
-			// 		intersects[0].point.sub(obj_len)
-			// 	)
-			// 	// console.log(intersects[0].point.sub(obj_len))
-			// } else {
-				object.position.add(mv)
-			// 	// console.log('mv')
-			// }
-
+			object.position.add(mv)
 		}
 
 		if(object.position.y > 2) {
+
 			object.position.y -= 0.2;
+
 		}
 
 		if(jumpPower > 0) {
+
 			object.position.y += this.jumpStep
 			jumpPower -= this.jumpAttenuation
+
 		}
 
-		// TODO: search raycast with palyer
 		if(object.position.y < 2) {
+
 			object.position.y = 2;
 			canJump = true
+
 		}
 
 	}

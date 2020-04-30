@@ -25,7 +25,6 @@ const config = env => {
                 MODE: `"${env}"`
             }),
             new webpack.ProvidePlugin({
-                THREE: path.join(__dirname, 'src/THREE/THREE.js')
             })
         ]
     }

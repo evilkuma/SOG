@@ -3,7 +3,7 @@ module.exports = [
     // JS
     {
         test: /\.js$/,
-        exclude: file => /node_modules/.test(file) && !file.includes('/node_modules/three/'),
+        exclude: file => /node_modules/.test(file),
         use: ['babel-loader']
     },
     // CSS
